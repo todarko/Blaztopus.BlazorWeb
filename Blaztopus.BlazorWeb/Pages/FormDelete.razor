@@ -1,0 +1,74 @@
+﻿@page "/formdelete/{id}"
+
+@using BlazorWeb.Models
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ModalService _modalService
+@inject MessageService _message
+@inject NotificationService _notice
+
+<h3>Delete</h3>
+
+<Form  Model="@model"
+      LabelColSpan="8"
+      WrapperColSpan="16"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed">
+    <FormItem Label="Id">
+        <Input @bind-Value="@context.Id" hidden />
+    </FormItem>
+    <FormItem Label="FirstName">
+        <Input Disabled @bind-Value="@context.FirstName" />
+    </FormItem>
+    <FormItem Label="LastName">
+        <Input Disabled @bind-Value="@context.LastName" />
+    </FormItem>
+    <FormItem WrapperColOffset="8" WrapperColSpan="16">
+        <Button Type="@ButtonType.Primary" HtmlType="submit">
+            Delete
+        </Button>
+    </FormItem>
+</Form>
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+    private Form model = new Form();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        model = await Http.GetFromJsonAsync<Form>(NavigationManager.BaseUri + "api/Forms/" + Id);
+    }
+
+    private async Task OnFinish()
+    {
+        if (model.Id != default(Guid))
+        {
+            try
+            {
+                var response = await Http.DeleteAsync(NavigationManager.BaseUri + "api/Forms/" + model.Id);
+                var blah = response.Content.ReadAsStreamAsync().Result;
+                Console.WriteLine(blah);
+
+            }
+            catch (Exception eee)
+            {
+                Console.WriteLine(eee.Message);
+                throw;
+            }
+        }
+        Console.WriteLine("e");
+        NavigationManager.NavigateTo(NavigationManager.BaseUri + "/formlist");
+    }
+
+    private async Task OnFinishFailed()
+    {
+        await _notice.Open(new NotificationConfig()
+            {
+                Message = "Whoops@",
+                Description = "There was an error with the last request :( Contact IT."
+            });
+        // notification that there was an error
+        Console.WriteLine($"Failed:");
+    }
+}

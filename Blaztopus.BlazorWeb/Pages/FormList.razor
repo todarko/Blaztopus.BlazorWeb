@@ -1,0 +1,79 @@
+﻿@page "/formlist"
+
+@using BlazorWeb.Models
+@using AntDesign
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ModalService _modalService
+@inject MessageService _message
+@inject NotificationService _notice
+
+<h3>Form Submission</h3>
+@if (FormNew.Count < 1)
+{
+    <Skeleton Active="true"></Skeleton>
+}
+else
+{
+<div>
+    <Card Title=@("Wine Types")>
+        @foreach (var item in FormNew)
+        {
+            <CardGrid Style="width:25%;text-align:center" Hoverable="true">
+                <strong>@item.FirstName</strong>
+                <strong>@item.LastName</strong>
+                <Button Type="primary" OnClick="@(()=>RouteEdit(item))">
+                    Edit
+                </Button>
+                <Button OnClick="@(()=>RouteDelete(item))" Type="dashed">
+                    Delete
+                </Button>
+            </CardGrid>
+        }
+    </Card>
+</div>     
+}
+
+
+@code {
+    protected List<Form> FormNew = new();
+    bool _loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        FormNew = await Http.GetFromJsonAsync<List<Form>>(NavigationManager.BaseUri + "api/Forms");
+        _loading = false;
+    }
+    private void RouteEdit(Form item)
+    {
+        NavigationManager.NavigateTo(NavigationManager.BaseUri + "/formupdate/" + item.Id);
+    }
+    private void RouteDelete(Form item)
+    {
+        NavigationManager.NavigateTo(NavigationManager.BaseUri + "/formdelete/" + item.Id);
+    }
+
+    List<DataItem> _listData = new List<int>() { 1, 2, 3 }.Select(x => new DataItem()
+        {
+
+            Href = "http://ng.ant.design",
+            Title = $"ant design part {x}",
+            Avatar = "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
+            Description = "Ant Design, a design language for background applications, is refined by Ant UED Team.",
+            Content =
+                  "We supply a series of design principles, practical patterns and high quality design resources " +
+                  "(Sketch and Axure), to help people create their product prototypes beautifully and efficiently."
+        }).ToList();
+
+
+    private class DataItem
+    {
+        public string Href { get; set; }
+        public string Title { get; set; }
+        public string Avatar { get; set; }
+        public string Description { get; set; }
+        public string Content { get; set; }
+
+    }
+}
