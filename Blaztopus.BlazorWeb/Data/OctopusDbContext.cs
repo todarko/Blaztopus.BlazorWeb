@@ -29,7 +29,7 @@ namespace Blaztopus.BlazorWeb.Data
                 .HasOne<FormChild>(s => s.FormChild)
                 .WithMany(g => g.Forms)
                 .HasForeignKey(s => s.FormChildId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<Form> Forms { get; set; }
