@@ -3,15 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blaztopus.BlazorWeb.Models
 {
-    public class Form
+    public class FormChild
     {
+        public FormChild()
+        {
+            Forms = new HashSet<Form>();
+        }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
 
-        public Guid? FormChildId { get; set; }
-        public FormChild? FormChild { get; set; }
+        public ICollection<Form> Forms { get; set; }
     }
 }

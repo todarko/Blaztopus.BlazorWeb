@@ -1,0 +1,72 @@
+﻿@page "/formchildsnew"
+
+@using BlazorWeb.Models
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ModalService _modalService
+@inject MessageService _message
+@inject NotificationService _notice
+
+<h3>Add Form</h3>
+
+<Form  Model="@model"
+      LabelColSpan="8"
+      WrapperColSpan="16"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed">
+    <FormItem Label="FirstName">
+        <Input @bind-Value="@context.FirstName" />
+    </FormItem>
+    <FormItem Label="LastName">
+        <Input @bind-Value="@context.LastName" />
+    </FormItem>
+    <FormItem WrapperColOffset="8" WrapperColSpan="16">
+        <Button Type="@ButtonType.Primary" HtmlType="submit">
+            Submit
+        </Button>
+    </FormItem>
+</Form>
+@code {
+    protected List<FormChild> NewForm = new();
+    private FormChild model = new FormChild();
+    private Form<FormChild> _form;
+
+
+    private async Task OnFinish()
+    {
+        if (model.Id != default(Guid))
+        {
+            try
+            {
+                var response = await Http.PutAsJsonAsync(NavigationManager.BaseUri + "api/FormChilds", model);
+                var blah = response.Content.ReadAsStreamAsync().Result;
+                Console.WriteLine(blah);
+
+            }
+            catch (Exception eee)
+            {
+                Console.WriteLine(eee.Message);
+                throw;
+            }
+        }
+        else
+        {
+            await Http.PostAsJsonAsync(NavigationManager.BaseUri + "api/FormChilds", model);
+            NewForm.Add(model);
+        }
+        Console.WriteLine("e");
+        NavigationManager.NavigateTo(NavigationManager.BaseUri + "/formlist");
+    }
+
+    private async Task OnFinishFailed()
+    {
+        await _notice.Open(new NotificationConfig()
+            {
+                Message = "Whoops@",
+                Description = "There was an error with the last request :( Contact IT."
+            });
+        // notification that there was an error
+        Console.WriteLine($"Failed:");
+    }
+}

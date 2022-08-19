@@ -32,13 +32,52 @@ namespace Blaztopus.BlazorWeb.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("FormChildId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FormChildId");
+
                     b.ToTable("Forms");
+                });
+
+            modelBuilder.Entity("Blaztopus.BlazorWeb.Models.FormChild", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FormChildren");
+                });
+
+            modelBuilder.Entity("Blaztopus.BlazorWeb.Models.Form", b =>
+                {
+                    b.HasOne("Blaztopus.BlazorWeb.Models.FormChild", "FormChild")
+                        .WithMany("Forms")
+                        .HasForeignKey("FormChildId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("FormChild");
+                });
+
+            modelBuilder.Entity("Blaztopus.BlazorWeb.Models.FormChild", b =>
+                {
+                    b.Navigation("Forms");
                 });
 #pragma warning restore 612, 618
         }

@@ -22,6 +22,17 @@ namespace Blaztopus.BlazorWeb.Data
             : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Form>()
+                .HasOne<FormChild>(s => s.FormChild)
+                .WithMany(g => g.Forms)
+                .HasForeignKey(s => s.FormChildId)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
+
         public DbSet<Form> Forms { get; set; }
+        public DbSet<FormChild> FormChildren { get; set; }
     }
 }
